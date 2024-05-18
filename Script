@@ -1,0 +1,1322 @@
+:: Made by ELTXZU
+:: Discord: https://discord.gg/F9GQSft9n4
+:: TikTok: ELTXZU
+
+@echo off
+title XZBOOST 1.0 - Eltxzu
+:menu
+color 5
+echo.
+echo.                                                XZBOOST 1.0 --- ELTXZU
+echo.                                              The ultimate tweaking script
+echo.                                  Any damage or error that occur is not my responsibility. 
+echo.                                              https://discord.gg/3UrHDw28nn
+echo.                                                    Use at own risk.
+echo.
+echo.  + ------------------------------------------------------------------------------------------------------------- +                                                                                                               
+echo.    [1] Restore Point        [7] Debloating                                                                                
+echo.                                                                                            
+echo.    [2] Basic Tweaks         [8] Latency Tweaks                                                                                    
+echo.                                                                                                  
+echo.    [3] Service Tweaks       [9] Disabled Windows Defender                                                                                     
+echo.                                                                                                   
+echo.    [4] CPU Tweaks           [10] Optimize Mouse & Keyboard                                                                                   
+echo.                                                                                                  
+echo.    [5] GPU Tweaks                                                                                              
+echo.                                                                                                  
+echo.    [6] Clean UP                                                                                              
+echo.                                                                                  
+echo.                                                                                                   
+echo.                                                      [13] Credits                                        
+echo.                                                                                                 
+echo.                                               [11] Exit    [12] Restart PC                                                  
+echo.  + ------------------------------------------------------------------------------------------------------------- +
+echo.
+echo.
+echo.
+set /p choice= ^ Enter Your Option:
+if [%choice%]==[] echo.&echo Invalid Choice&echo.&pause&goto :menu
+if %choice% gtr 13 echo.&echo Invalid Choice&echo.&pause&goto :menu
+if %choice%==1 goto :1
+if %choice%==2 goto :2
+if %choice%==3 goto :3
+if %choice%==4 goto :4
+if %choice%==5 goto :5
+if %choice%==6 goto :6
+if %choice%==7 goto :7
+if %choice%==8 goto :8
+if %choice%==9 goto :9
+if %choice%==10 goto :10
+if %choice%==11 goto :11
+if %choice%==12 goto :12
+if %choice%==13 goto :13
+:: restorepoint
+:1
+cls
+echo Enabling System Protection.
+powershell -ExecutionPolicy Unrestricted -NoProfile Enable-ComputerRestore -Drive 'C:\'>nul 2>&1
+Reg.exe delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\WindowsNT\CurrentVersion\SystemRestore" /v "RPSessionInterval" /f  >nul 2>&1
+Reg.exe delete "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\WindowsNT\CurrentVersion\SystemRestore" /v "DisableConfig" /f >nul 2>&1
+Reg.exe add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\SystemRestore" /v "SystemRestorePointCreationFrequency" /t REG_DWORD /d 0 /f  >nul 2>&1
+timeout 1 > nul 
+echo Creating restore point...
+powershell -Command "Checkpoint-Computer -Description 'XZBoost Restore Point'"
+echo Restore point successfully created.
+pause
+goto :menu
+
+:: Basic
+:2
+set /p choice=Do you want to enable dark mode? (Y/N):
+
+if /i "%choice%"=="Y" (
+    echo Enabling Dark Mode...
+    reg add HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize /v AppsUseLightTheme /t REG_DWORD /d 0 /f
+    reg add HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize /v ColorPrevalence /t REG_DWORD /d 0 /f
+    reg add HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize /v SystemUsesLightTheme /t REG_DWORD /d 0 /f
+    taskkill /f /im explorer.exe
+    start explorer.exe
+    echo Darkmode applied successfully.
+    timeout 2 > nul
+) else if /i "%choice%"=="N" (
+    echo Didnt apply Dark Mode, continuing tweaks...
+    timeout 2 > nul
+) else (
+    echo Invalid choice. Please select Y or N.
+    goto menu
+)
+
+@echo off
+:winupd 
+set /p choice=Do you want to disable Windows Updates? (Y/N):
+
+if /i "%choice%"=="Y" (
+     sc config wuauserv start=disabled
+     reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" /v "NoAutoUpdate" /t REG_DWORD /d 1 /f
+     timeout 2 > nul
+) else if /i "%choice%"=="N" (
+    echo Windows Updates has not been disabled, continuing tweaks...
+    timeout 2 > nul
+) else (
+    echo Invalid choice. Please select Y or N.
+    goto :winupd
+)
+
+
+
+cls
+color 5
+echo Disabling Location...
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location" /v "Value" /t REG_SZ /d "Deny" /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Sensor\Overrides\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}" /v "SensorPermissionState" /t REG_DWORD /d 0 /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\lfsvc\Service\Configuration" /v "Status" /t REG_DWORD /d 0 /f
+reg add "HKLM\SYSTEM\Maps" /v "AutoUpdateEnabled" /t REG_DWORD /d 0 /f
+echo Location tweaks applied successfully.
+timeout 2 > nul
+
+cls
+color 5
+echo Removing Storage Sense...
+powershell -Command "Remove-Item -Path 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\StorageSense\Parameters\StoragePolicy' -Recurse -ErrorAction SilentlyContinue"
+echo Storage tweaks applied successfully.
+timeout 2 > nul
+
+cls
+color 5
+echo Disabling GameDVR...
+reg add "HKCU\System\GameConfigStore" /v GameDVR_FSEBehavior /t REG_DWORD /d 2 /f
+reg add "HKCU\System\GameConfigStore" /v GameDVR_Enabled /t REG_DWORD /d 0 /f
+reg add "HKCU\System\GameConfigStore" /v GameDVR_DXGIHonorFSEWindowsCompatible /t REG_DWORD /d 1 /f
+reg add "HKCU\System\GameConfigStore" /v GameDVR_HonorUserFSEBehaviorMode /t REG_DWORD /d 1 /f
+reg add "HKCU\System\GameConfigStore" /v GameDVR_EFSEFeatureFlags /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\GameDVR" /v AllowGameDVR /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Search" /v BingSearchEnabled /t REG_DWORD /d 0 /f
+echo DVR tweaks applied successfully.
+timeout 2 > nul
+
+cls
+color 5
+echo Disabling Gamemode...
+reg add "HKEY_CURRENT_USER\Software\Microsoft\GameBar" /v "AllowAutoGameMode" /t REG_DWORD /d 0 /f
+reg add "HKEY_CURRENT_USER\Software\Microsoft\GameBar" /v "AutoGameModeEnabled" /t REG_DWORD /d 0 /f
+echo Game Mode tweaks applied successfully.
+timeout 2 > nul
+
+cls
+color 5
+echo Enabling Hardware Accelerated GPU Scheduling...
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v "HwSchMode" /t REG_DWORD /d 2 /f
+echo GPU Scheduling tweaks applied successfully.
+timeout 2 > nul
+
+cls
+color 5
+echo Setting Display For Performance...
+reg add "HKCU\Control Panel\Desktop" /v "DragFullWindows" /t REG_SZ /d "0" /f
+reg add "HKCU\Control Panel\Desktop" /v "MenuShowDelay" /t REG_SZ /d "200" /f
+reg add "HKCU\Control Panel\Desktop\WindowMetrics" /v "MinAnimate" /t REG_SZ /d "0" /f
+reg add "HKCU\Control Panel\Keyboard" /v "KeyboardDelay" /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ListviewAlphaSelect" /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ListviewShadow" /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "TaskbarAnimations" /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" /v "VisualFXSetting" /t REG_DWORD /d 3 /f
+reg add "HKCU\Software\Microsoft\Windows\DWM" /v "EnableAeroPeek" /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "TaskbarMn" /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "TaskbarDa" /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowTaskViewButton" /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Search" /v "SearchboxTaskbarMode" /t REG_DWORD /d 0 /f
+powershell -Command "Set-ItemProperty -Path 'HKCU:\Control Panel\Desktop' -Name 'UserPreferencesMask' -Type Binary -Value ([byte[]](144,18,3,128,16,0,0,0))"
+echo Set display for Performance successfully.
+timeout 2 > nul
+
+cls
+color 5
+echo Enabling Win 10 Right-Click Menu...
+powershell -Command "New-Item -Path 'HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}' -Name 'InprocServer32' -Force -Value ''"
+echo Windows 10 Right-click menu applied successfully.
+timeout 2 > nul
+
+cls
+color 5
+echo Disabling Mouse Acceleration...
+reg add "HKCU\Control Panel\Mouse" /v MouseSpeed /t REG_SZ /d 0 /f
+reg add "HKCU\Control Panel\Mouse" /v MouseThreshold1 /t REG_SZ /d 0 /f
+reg add "HKCU\Control Panel\Mouse" /v MouseThreshold2 /t REG_SZ /d 0 /f
+echo Mouse settings applied successfully.
+timeout 2 > nul
+
+cls
+color 5
+echo Starting HomeGroup Tweaks...
+sc config HomeGroupListener start=demand >nul 2>&1
+sc config HomeGroupProvider start=demand >nul 2>&1
+echo HomeGroup services tweaked successfully.
+timeout 2 > nul
+
+cls
+color 5
+
+echo Disabling parental controls service...
+
+echo # Disable parental controls >> %WINDIR%\System32\drivers\etc\hosts
+echo 0.0.0.0 rs3clients.timeusage.family.microsoft.com >> %WINDIR%\System32\drivers\etc\hosts
+echo 0.0.0.0 clientfd.family.microsoft.com >> %WINDIR%\System32\drivers\etc\hosts
+echo 0.0.0.0 family.microsoft.com >> %WINDIR%\System32\drivers\etc\hosts
+
+sc stop WpcMonSvc
+sc config WpcMonSvc start= disabled
+reg delete "HKLM\SYSTEM\CurrentControlSet\Services\WpcMonSvc" /f
+takeown /f %WINDIR%\System32\WpcDesktopMonSvc.dll
+cacls %WINDIR%\System32\WpcDesktopMonSvc.dll /e /p %USERNAME%:F
+del %WINDIR%\System32\WpcDesktopMonSvc.dll /Q /F
+takeown /f "%PROGRAMDATA%\Microsoft\Windows\Parental Controls"
+cacls "%PROGRAMDATA%\Microsoft\Windows\Parental Controls" /e /p %USERNAME%:F
+del "%PROGRAMDATA%\Microsoft\Windows\Parental Controls" /S /Q /F
+rd "%PROGRAMDATA%\Microsoft\Windows\Parental Controls" /S /Q
+powershell -noprofile -noninteractive -command "function Take-Permissions { param($rootKey, $key, [System.Security.Principal.SecurityIdentifier]$sid = 'S-1-5-32-545', $recurse = $true); switch -regex ($rootKey) { 'HKCU|HKEY_CURRENT_USER'    { $rootKey = 'CurrentUser' } 'HKLM|HKEY_LOCAL_MACHINE'   { $rootKey = 'LocalMachine' } 'HKCR|HKEY_CLASSES_ROOT'    { $rootKey = 'ClassesRoot' } 'HKCC|HKEY_CURRENT_CONFIG'  { $rootKey = 'CurrentConfig' } 'HKU|HKEY_USERS'            { $rootKey = 'Users' } }; $import = '[DllImport(\"ntdll.dll\")] public static extern int RtlAdjustPrivilege(ulong a, bool b, bool c, ref bool d);'; $ntdll = Add-Type -Member $import -Name NtDll -PassThru; $privileges = @{ SeTakeOwnership = 9; SeBackup =  17; SeRestore = 18 }; foreach ($i in $privileges.Values) { $null = $ntdll::RtlAdjustPrivilege($i, 1, 0, [ref]0) }; function Take-KeyPermissions { param($rootKey, $key, $sid, $recurse, $recurseLevel = 0); $regKey = [Microsoft.Win32.Registry]::$rootKey.OpenSubKey($key, 'ReadWriteSubTree', 'TakeOwnership'); $acl = New-Object System.Security.AccessControl.RegistrySecurity; $acl.SetOwner($sid); $regKey.SetAccessControl($acl); $acl.SetAccessRuleProtection($false, $false); $regKey.SetAccessControl($acl); if ($recurseLevel -eq 0) { $regKey = $regKey.OpenSubKey('', 'ReadWriteSubTree', 'ChangePermissions'); $rule = New-Object System.Security.AccessControl.RegistryAccessRule($sid, 'FullControl', 'ContainerInherit', 'None', 'Allow'); $acl.ResetAccessRule($rule); $regKey.SetAccessControl($acl); }; if ($recurse) { foreach($subKey in $regKey.OpenSubKey('').GetSubKeyNames()) { Take-KeyPermissions $rootKey ($key+'\'+$subKey) $sid $recurse ($recurseLevel+1); } }; }; Take-KeyPermissions $rootKey $key $sid $recurse; };Take-Permissions 'HKLM' 'SOFTWARE\Microsoft\Windows\CurrentVersion\Parental Controls' 'S-1-5-32-544' $true;"
+reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Parental Controls" /f
+
+
+echo Successfully disabled Parental Cotrols.
+timeout 2 > nul
+
+cls
+color 5
+
+set /p choice="Do you want to disable Wi-Fi? (Y/N): "
+
+if /i "%choice%"=="y" (
+    netsh interface set interface "Wi-Fi" admin=disabled
+    sc config NlaSvc start= disabled
+    sc config LanmanWorkstation start= disabled
+    schtasks /Change /TN "Microsoft\Windows\WlanSvc\CDSSync" /Disable
+    schtasks /Change /TN "Microsoft\Windows\WCM\WiFiTask" /Disable
+    schtasks /Change /TN "Microsoft\Windows\NlaSvc\WiFiTask" /Disable
+    schtasks /Change /TN "Microsoft\Windows\DUSM\dusmtask" /Disable
+    reg add "HKLM\Software\Policies\Microsoft\Windows\NetworkConnectivityStatusIndicator" /v "NoActiveProbe" /t REG_DWORD /d "1" /f
+    reg add "HKLM\System\CurrentControlSet\Services\NlaSvc\Parameters\Internet" /v "EnableActiveProbing" /t REG_DWORD /d "0" /f
+    sc config BFE start= demand
+    sc config Dnscache start= demand
+    sc config WinHttpAutoProxySvc start= demand
+    sc config Dhcp start= auto
+    sc config DPS start= auto
+    sc config lmhosts start= disabled
+    sc config nsi start= auto
+    sc config Wcmsvc start= disabled
+    sc config Winmgmt start= auto
+    sc config WlanSvc start= demand
+    echo Wi-Fi has been disabled.
+) else if /i "%choice%"=="n" (
+    echo Wi-Fi will not be disabled.
+) else (
+    echo Invalid choice. Please select 'Y' or 'N'.
+)
+
+cls
+color 5
+echo Removing Xbox Gaming Service... 
+powershell -command "get-appxpackage Microsoft.GamingServices | remove-AppxPackage -allusers"
+echo Xbox Gaming Service deleted successfully.
+timeout 2 > nul
+
+cls
+color 5
+echo Disabling Teredo...
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters" /v DisabledComponents /t REG_DWORD /d 1 /f
+echo Teredo disabled successfully.
+timeout 2 > nul
+
+cls
+color 5
+echo Disabling IPv6...
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters" /v "DisabledComponents" /t REG_DWORD /d 255 /f
+powershell -Command "Disable-NetAdapterBinding -Name '*' -ComponentID ms_tcpip6"
+echo IPv6 disabled successfully.
+timeout 2 > nul
+
+cls
+color 5
+echo Disabling Hibernation...
+reg add "HKLM\System\CurrentControlSet\Control\Session Manager\Power" /v HibernateEnabled /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings" /v ShowHibernateOption /t REG_DWORD /d 0 /f
+powercfg.exe /hibernate off
+echo Hibernation disabled successfully.
+timeout 2 > nul
+
+cls
+color 5
+echo Disabling Telemetry...
+schtasks /Change /TN "Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser" /Disable 
+schtasks /Change /TN "Microsoft\Windows\Application Experience\ProgramDataUpdater" /Disable 
+schtasks /Change /TN "Microsoft\Windows\Autochk\Proxy" /Disable
+schtasks /Change /TN "Microsoft\Windows\Customer Experience Improvement Program\Consolidator" /Disable 
+schtasks /Change /TN "Microsoft\Windows\Customer Experience Improvement Program\UsbCeip" /Disable 
+schtasks /Change /TN "Microsoft\Windows\DiskDiagnostic\Microsoft-Windows-DiskDiagnosticDataCollector" /Disable 
+schtasks /Change /TN "Microsoft\Windows\Feedback\Siuf\DmClient" /Disable 
+schtasks /Change /TN "Microsoft\Windows\Feedback\Siuf\DmClientOnScenarioDownload" /Disable 
+schtasks /Change /TN "Microsoft\Windows\Windows Error Reporting\QueueReporting" /Disable 
+schtasks /Change /TN "Microsoft\Windows\Application Experience\MareBackup" /Disable 
+schtasks /Change /TN "Microsoft\Windows\Application Experience\StartupAppTask" /Disable 
+schtasks /Change /TN "Microsoft\Windows\Application Experience\PcaPatchDbTask" /Disable
+schtasks /Change /TN "Microsoft\Windows\Maps\MapsUpdateTask" /Disable
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v AllowTelemetry /t REG_DWORD /d 0 /f
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v ContentDeliveryAllowed /t REG_DWORD /d 0 /f
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v OemPreInstalledAppsEnabled /t REG_DWORD /d 0 /f
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v PreInstalledAppsEnabled /t REG_DWORD /d 0 /f
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v PreInstalledAppsEverEnabled /t REG_DWORD /d 0 /f
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v SilentInstalledAppsEnabled /t REG_DWORD /d 0 /f
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v SubscribedContent-338387Enabled /t REG_DWORD /d 0 /f
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v SubscribedContent-338388Enabled /t REG_DWORD /d 0 /f
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v SubscribedContent-338389Enabled /t REG_DWORD /d 0 /f
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v SubscribedContent-353698Enabled /t REG_DWORD /d 0 /f
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" /v SystemPaneSuggestionsEnabled /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /v DisableWindowsConsumerFeatures /t REG_DWORD /d 1 /f
+reg add "HKCU\SOFTWARE\Microsoft\Siuf\Rules" /v NumberOfSIUFInPeriod /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v DoNotShowFeedbackNotifications /t REG_DWORD /d 1 /f
+reg add "HKCU\SOFTWARE\Policies\Microsoft\Windows\CloudContent" /v DisableTailoredExperiencesWithDiagnosticData /t REG_DWORD /d 1 /f
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AdvertisingInfo" /v DisabledByGroupPolicy /t REG_DWORD /d 1 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\Windows Error Reporting" /v Disabled /t REG_DWORD /d 1 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization\Config" /v DODownloadMode /t REG_DWORD /d 1 /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Remote Assistance" /v fAllowToGetHelp /t REG_DWORD /d 0 /f
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\OperationStatusManager" /v EnthusiastMode /t REG_DWORD /d 1 /f
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v ShowTaskViewButton /t REG_DWORD /d 0 /f
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People" /v PeopleBand /t REG_DWORD /d 0 /f
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v LaunchTo /t REG_DWORD /d 1 /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v LongPathsEnabled /t REG_DWORD /d 1 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\DriverSearching" /v SearchOrderConfig /t REG_DWORD /d 1 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v SystemResponsiveness /t REG_DWORD /d 0 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v NetworkThrottlingIndex /t REG_DWORD /d 4294967295 /f
+reg add "HKCU\Control Panel\Desktop" /v MenuShowDelay /t REG_DWORD /d 1 /f
+reg add "HKCU\Control Panel\Desktop" /v AutoEndTasks /t REG_DWORD /d 1 /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" /v ClearPageFileAtShutdown /t REG_DWORD /d 0 /f
+reg add "HKLM\SYSTEM\ControlSet001\Services\Ndu" /v Start /t REG_DWORD /d 2 /f
+reg add "HKCU\Control Panel\Mouse" /v MouseHoverTime /t REG_SZ /d 400 /f
+reg add "HKLM\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" /v IRPStackSize /t REG_DWORD /d 30 /f
+reg add "HKCU\SOFTWARE\Policies\Microsoft\Windows\Windows Feeds" /v EnableFeeds /t REG_DWORD /d 0 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Feeds" /v ShellFeedsTaskbarViewMode /t REG_DWORD /d 2 /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v HideSCAMeetNow /t REG_DWORD /d 1 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games" /v "GPU Priority" /t REG_DWORD /d 8 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games" /v Priority /t REG_DWORD /d 6 /f
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games" /v "Scheduling Category" /t REG_SZ /d High /f
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement" /v "ScoobeSystemSettingEnabled" /t REG_DWORD /d 0 /f
+
+bcdedit /set {current} bootmenupolicy Legacy >nul 2>&1
+
+for /f "tokens=3" %%i in ('reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v CurrentBuild 2^>nul ^| findstr /r /c:"CurrentBuild"') do (
+    if %%i lss 22557 (
+        start /min taskmgr.exe
+        timeout /t 2 >nul
+        :loop
+        reg query "HKCU\Software\Microsoft\Windows\CurrentVersion\TaskManager" /v Preferences >nul 2>&1
+        if %errorlevel% equ 0 (
+            set preferences=1
+        ) else (
+            timeout /t 1 >nul
+            goto loop
+        )
+        taskkill /f /im taskmgr.exe >nul 2>&1
+        reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\TaskManager" /v Preferences /t REG_BINARY /d 0000000000000000000000000000000000000000000000000000000000000000 /f >nul 2>&1
+    )
+)
+
+reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{0DB7E03F-FC29-4DC6-9020-FF41B59E513A}" /f >nul 2>&1
+
+if exist "HKLM\SOFTWARE\Policies\Microsoft\Edge" (
+    reg delete "HKLM\SOFTWARE\Policies\Microsoft\Edge" /f >nul 2>&1
+)
+
+for /f "tokens=2" %%a in ('wmic OS get TotalVisibleMemorySize ^| findstr /r /v "^$"') do set "ram=%%a"
+set /a "ram=ram/1024"
+reg add "HKLM\SYSTEM\CurrentControlSet\Control" /v SvcHostSplitThresholdInKB /t REG_DWORD /d %ram% /f >nul 2>&1
+
+set "autoLoggerDir=%PROGRAMDATA%\Microsoft\Diagnosis\ETLLogs\AutoLogger"
+if exist "%autoLoggerDir%\AutoLogger-Diagtrack-Listener.etl" (
+    del /q "%autoLoggerDir%\AutoLogger-Diagtrack-Listener.etl" >nul 2>&1
+)
+icacls "%autoLoggerDir%" /deny SYSTEM:(OI)(CI)F >nul 2>&1
+
+powershell -Command "Set-MpPreference -SubmitSamplesConsent 2 -ErrorAction SilentlyContinue"
+echo Telemetry has been disabled successfully.
+timeout 2 > nul
+
+@echo off
+cls
+color 5
+echo Disabling all startup apps...
+echo --------------------------------------
+for /f "tokens=2 delims==" %%I in ('wmic startup get caption /format:list') do (
+    echo Disabling %%I
+    reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run" /v "%%I" /t REG_SZ /d "" /f >nul 2>&1
+)
+timeout 2 > nul
+echo --------------------------------------
+echo Disabling all startup programs...
+reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run" /f 
+reg delete "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run" /f
+reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\RunNotification" /f
+reg delete "HKEY_LOCAL_MACHINE\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Run" /f 
+rd /s /q "%AppData%\Microsoft\Windows\Start Menu\Programs\Startup"
+echo --------------------------------------
+echo Readding Startup Regs
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run" /f 
+reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run" /f
+reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\RunNotification" /f
+reg add "HKEY_LOCAL_MACHINE\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Run" /f
+mkdir "%AppData%\Microsoft\Windows\Start Menu\Programs\Startup"   
+echo All startup programs disabled.
+timeout 2 > nul
+
+@echo off
+cls
+color D
+echo Removing GameBarPresenceWriter...
+CD /D %HOMEDRIVE%%HOMEPATH%\Desktop
+echo %CD%
+
+REM ************ Main process *****************
+
+set "fileToDelete=%SystemRoot%\System32\GameBarPresenceWriter.exe"
+
+if exist "%fileToDelete%" (
+    echo *** Taking ownership of the file ***
+    takeown /F "%fileToDelete%"
+    
+    echo *** Adjusting permissions ***
+    icacls "%fileToDelete%" /grant administrators:F
+
+    echo *** Removing Gamebar Presence Writer ***
+    del "%fileToDelete%" /s /f /q
+    echo File deleted successfully.
+) else (
+    echo File not found: %fileToDelete%
+)
+
+timeout 2 > nul
+
+cls
+color 5
+echo Removing Xbox Gaming Service... 
+powershell -command "get-appxpackage Microsoft.GamingServices | remove-AppxPackage -allusers"
+echo Xbox Gaming Service deleted successfully.
+timeout 2 > nul
+
+@echo off
+cls
+color 5
+echo Removing Microsoft Edge.
+echo Stopping Edge tasks...
+taskkill /f /im msedge.exe >nul 2>&1
+taskkill /f /im msedge.exe /fi "IMAGENAME eq msedge.exe" >nul 2>&1
+taskkill /f /im msedge.exe /fi "IMAGENAME eq msedge.exe" >nul 2>&1
+
+echo Deleting Microsoft Edge directories...
+
+rd /s /q "C:\Program Files (x86)\Microsoft\Edge" >nul 2>&1
+
+rd /s /q "C:\Program Files (x86)\Microsoft\EdgeCore" >nul 2>&1
+
+rd /s /q "C:\Program Files (x86)\Microsoft\EdgeUpdate" >nul 2>&1
+
+rd /s /q "C:\Program Files (x86)\Microsoft\EdgeWebView" >nul 2>&1
+
+rd /s /q "C:\Program Files (x86)\Microsoft\Temp" >nul 2>&1
+
+echo Deleting Microsoft Edge shortcuts...
+
+del "C:\Users\Public\Desktop\Microsoft Edge.lnk" >nul 2>&1
+
+del "%ProgramData%\Microsoft\Windows\Start Menu\Programs\Microsoft Edge.lnk" >nul 2>&1
+
+del "%APPDATA%\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\Microsoft Edge.lnk" >nul 2>&1
+
+echo Microsoft Edge deleted successfully.
+timeout 2 > nul
+
+@echo off
+cls
+color 5
+echo Removing OneDrive...
+echo Kill OneDrive process
+taskkill.exe /F /IM "OneDrive.exe"
+taskkill.exe /F /IM "explorer.exe"
+
+echo Remove OneDrive
+winget uninstall --silent --accept-source-agreements Microsoft.OneDrive
+
+echo Remove OneDrive from explorer sidebar
+reg add "HKCR\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" /v "System.IsPinnedToNameSpaceTree" /t REG_DWORD /d 0 /f
+reg add "HKCR\Wow6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" /v "System.IsPinnedToNameSpaceTree" /t REG_DWORD /d 0 /f
+
+echo Removing run hook for new users
+reg load "hku\Default" "C:\Users\Default\NTUSER.DAT"
+reg delete "HKEY_USERS\Default\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /v "OneDriveSetup" /f
+reg unload "hku\Default"
+
+echo Removing start menu entry
+del /f /q "%USERPROFILE%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\OneDrive.lnk"
+
+echo Removing scheduled task
+schtasks /delete /tn "OneDrive*" /f
+
+echo Restarting Explorer...
+start explorer.exe
+echo OneDrive deleted successfully.
+timeout 2 > nul
+
+@echo off
+cls
+color 5
+echo Removing Widget and WidgetService...
+echo Closing WidgetService and Widgets.
+taskkill /F /IM WidgetService.exe >nul 2>&1
+taskkill /F /IM Widgets.exe >nul 2>&1
+echo Uninstalling Windows web experience Pack...
+winget uninstall --silent --accept-source-agreements "Windows web experience Pack"
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PolicyManager\default\NewsAndInterests" /v "AllowNewsAndInterests" /t REG_DWORD /d 0 /f
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Dsh" /v "AllowNewsAndInterests" /t REG_DWORD /d 0 /f
+CD /D "C:\Program Files\WindowsApps\MicrosoftWindows.Client.WebExperience_424.1301.450.0_x64__cw5n1h2txyewy\Dashboard" >nul 2>&1
+echo echo %CD% >nul 2>&1
+
+REM ************ Main *****************
+
+set "file1ToDelete=WidgetService.exe"
+set "file2ToDelete=Widgets.exe"
+
+if exist "%file1ToDelete%" (
+    echo *** Taking ownership of %file1ToDelete% ***
+    takeown /F "%file1ToDelete%"
+    
+    echo *** Adjusting permissions for %file1ToDelete% ***
+    icacls "%file1ToDelete%" /grant administrators:F
+
+    echo *** Removing %file1ToDelete% ***
+    del "%file1ToDelete%" /s /f /q
+    echo %file1ToDelete% deleted successfully.
+) else (
+    echo File not found: %file1ToDelete% >nul 2>&1
+)
+
+if exist "%file2ToDelete%" (
+    echo *** Taking ownership of %file2ToDelete% ***
+    takeown /F "%file2ToDelete%"
+    
+    echo *** Adjusting permissions for %file2ToDelete% ***
+    icacls "%file2ToDelete%" /grant administrators:F
+
+    echo *** Removing %file2ToDelete% ***
+    del "%file2ToDelete%" /s /f /q
+    echo %file2ToDelete% deleted successfully.
+) else (
+    echo File not found: %file2ToDelete% >nul 2>&1
+)
+
+timeout 2 > nul
+
+@echo off
+cls
+color 5
+echo Removing Smartscreen...
+CD /D %HOMEDRIVE%%HOMEPATH%\Desktop
+echo %CD%
+
+REM ************ Main *****************
+
+set "smartscreenFileToDelete1=C:\Windows\System32\smartscreen.exe"
+set "smartscreenFileToDelete2=C:\Windows\SystemApps\Microsoft.Windows.AppRep.ChxApp_cw5n1h2txyewy\CHXSmartScreen.exe"
+
+REM Deleting Smartscreen.exe if exists
+if exist "%smartscreenFileToDelete1%" (
+    echo *** Taking ownership of the file ***
+    takeown /F "%smartscreenFileToDelete1%"
+    
+    echo *** Adjusting permissions ***
+    icacls "%smartscreenFileToDelete1%" /grant administrators:F
+
+    echo *** Removing Smartscreen.exe from System32 ***
+    del "%smartscreenFileToDelete1%" /f /q
+    echo File deleted successfully.
+) else (
+    echo File not found: %smartscreenFileToDelete1%
+)
+
+REM Deleting CHXSmartScreen.exe if exists
+if exist "%smartscreenFileToDelete2%" (
+    echo *** Taking ownership of the file ***
+    takeown /F "%smartscreenFileToDelete2%"
+    
+    echo *** Adjusting permissions ***
+    icacls "%smartscreenFileToDelete2%" /grant administrators:F
+
+    echo *** Removing CHXSmartScreen.exe from SystemApps ***
+    del "%smartscreenFileToDelete2%" /f /q
+    echo File deleted successfully.
+) else (
+    echo File not found: %smartscreenFileToDelete2%
+)
+
+timeout 2 > nul
+
+@echo off
+cls
+color 5
+echo Removing LockApp...
+CD /D %HOMEDRIVE%%HOMEPATH%\Desktop
+echo %CD%
+
+REM ************ Main process *****************
+
+set "lockAppFileToDelete=C:\Windows\SystemApps\Microsoft.LockApp_cw5n1h2txyewy\LockApp.exe"
+
+REM Deleting LockApp.exe if exists
+if exist "%lockAppFileToDelete%" (
+    echo *** Taking ownership of the file ***
+    takeown /F "%lockAppFileToDelete%"
+    
+    echo *** Adjusting permissions ***
+    icacls "%lockAppFileToDelete%" /grant administrators:F
+
+    echo *** Removing LockApp.exe from SystemApps ***
+    del "%lockAppFileToDelete%" /f /q
+    echo File deleted successfully.
+) else (
+    echo File not found: %lockAppFileToDelete%
+)
+
+timeout 2 > nul
+
+cls
+@echo off
+color 5
+echo Removing CCleaner...
+
+echo Terminating processes associated with CCleaner...
+taskkill /f /im CCleaner64.exe >nul 2>&1
+taskkill /f /im CCleanerPerformanceOptimizerService.exe >nul 2>&1
+taskkill /f /im CCleanerBrowser.exe >nul 2>&1
+
+echo Deleting CCleaner directory...
+rd /s /q "C:\Program Files\CCleaner" >nul 2>&1
+rd /s /q "C:\Program Files (x86)\CCleaner Browser" >nul 2>&1
+
+echo CCleaner deleted successfully.
+timeout 2 > nul
+
+cls
+@echo off
+color 5
+
+echo Basic Tweaks ran successfully.
+echo.
+echo Press any key to go to menu.
+pause >nul
+goto :menu
+
+:3
+:: Service Tweaks
+
+echo Running service disabler.
+echo.
+echo.
+color 5
+echo service disabler disables services like:
+echo  - Phone Linking (PhoneSvc)
+echo  - Mobile Hotspot (icssvc)
+echo  - Fax Services (Fax)
+echo  - Print Services (Spooler)
+echo  - Map Services (MapsBroker)
+echo  - Geolocation Services (lfsvc)
+echo  - Game Services (GameDVR and Broadcast User Service)
+echo  - Wallet Services (WalletService)
+echo  - RetailDemo (RetailDemo)
+echo  - Windows Insider Service (wisvc)
+echo  - Remote Registry (RemoteRegistry)
+echo  - Microsoft iSCSI Initiator Service (MSiSCSI)
+echo  - Delivery Optimization (DoSvc)
+echo  - Connected User Experiences and Telemetry (DiagTrack)
+echo  - Windows Error Reporting Service (WerSvc)
+echo  - Windows Search (WSearch)
+echo  - Connected Devices Platform Service (CDPSvc)
+echo  - Microsoft App-V Client (AppVClient)
+echo  - Windows Biometric Service (WbioSrvc)
+echo  - Windows Media Player Network Sharing Service (WMPNetworkSvc)
+echo  - Windows Media Player Network Sharing Service (WMPNetworkSvc)
+echo  - Diagnostic Policy Service (DPS)
+echo  - Diagnostic Policy Service (DPS)
+echo  - Superfetch (SysMain)
+echo  - Xbox Live Auth Manager (XblAuthManager)
+echo  - Xbox Live Game Save (XblGameSave)
+echo  - Xbox Live Networking Service (XboxNetApiSvc)
+echo  - Diagnostics (diagnosticshub.standardcollector.service)
+
+echo It disables more services too but they arent nessecary.
+echo.
+echo Press any key to continue...
+pause > nul
+    echo Disabling services...
+    echo.
+    sc config PhoneSvc start=disabled
+    sc config icssvc start=disabled
+    sc config Fax start=disabled
+    sc config Spooler start=disabled
+    sc config MapsBroker start=disabled
+    sc config lfsvc start=disabled
+    sc config GameDVR start=disabled
+    sc config BroadcastUserSvc start=disabled
+    sc config WalletService start=disabled
+    sc config RetailDemo start=disabled
+    sc config wisvc start=disabled
+    sc config RemoteRegistry start=disabled
+    sc config MSiSCSI start=disabled
+    sc config DoSvc start=disabled
+    sc config DiagTrack start=disabled
+    sc config WerSvc start=disabled
+    sc config WSearch start=disabled
+    sc config CDPSvc start=disabled
+    sc config AppVClient start=disabled
+    sc config WbioSrvc start=disabled
+    sc config WMPNetworkSvc start=disabled
+    sc config DPS start=disabled
+    sc config SysMain start=disabled
+    sc config OneSyncSvc start=disabled
+    sc config FontCache start=disabled
+    sc config W32Time start=disabled
+    sc config MsKeyboardFilter start=disabled
+    sc config NetTcpPortSharing start=disabled
+    sc config Netlogon start=disabled
+    sc config seclogon start=disabled
+    sc config FrameServer start=disabled
+    sc config TabletInputService start=disabled
+    sc config diagnosticshub.standardcollector.service start=disabled
+    sc config DisplayEnhancementService start= disabled
+    sc config Wecsvc start= disabled
+    sc config XboxGipSvc start= disabled
+    sc config XblAuthManager start= disabled
+    sc config XboxNetApiSvc start= disabled
+    sc config XblGameSave start= disabled
+    sc config WMPNetworkSvc start=disabled
+    sc config DisplayEnhancementService start=disabled
+    sc config Wecsvc start=disabled
+    sc config MpsSvc start=disabled
+    sc config TapiSrv start=disabled
+    sc config IKEEXT start=disabled
+    sc config TrkWks start=disabled
+    sc config PcaSvc start=disabled
+    sc config WPCSvc start=disabled
+    sc config BDESVC start=disabled
+    sc config WdiServiceHost start=disabled
+    sc config FDResPub start=disabled
+    sc config UmRdpService start=disabled
+    sc config WwanSvc start=disabled
+    reg add "HKLM\System\CurrentControlSet\Services\PimIndexMaintenanceSvc" /v "Start" /t REG_DWORD /d "4" /f
+    reg add "HKLM\System\CurrentControlSet\Services\WinHttpAutoProxySvc" /v "Start" /t REG_DWORD /d "4" /f
+    reg add "HKLM\System\CurrentControlSet\Services\BcastDVRUserService" /v "Start" /t REG_DWORD /d "4" /f
+    reg add "HKLM\System\CurrentControlSet\Services\xbgm" /v "Start" /t REG_DWORD /d "4" /f
+    reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\GameDVR" /v "AppCaptureEnabled" /t REG_DWORD /d "0" /f
+    reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\GameDVR" /v "AudioCaptureEnabled" /t REG_DWORD /d "0" /f
+    reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\GameDVR" /v "CursorCaptureEnabled" /t REG_DWORD /d "0" /f
+    reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\GameDVR" /v "MicrophoneCaptureEnabled" /t REG_DWORD /d "0" /f
+    reg add "HKCU\System\GameConfigStore" /v "GameDVR_FSEBehavior" /t REG_DWORD /d "2" /f
+    reg add "HKCU\System\GameConfigStore" /v "GameDVR_HonorUserFSEBehaviorMode" /t REG_DWORD /d "2" /f
+    reg add "HKCU\System\GameConfigStore" /v "GameDVR_Enabled" /t REG_DWORD /d "0" /f
+    reg add "HKLM\Software\Policies\Microsoft\Windows\GameDVR" /v "AllowgameDVR" /t REG_DWORD /d "0" /f
+    reg add "HKCU\Software\Microsoft\GameBar" /v "AutoGameModeEnabled" /t REG_DWORD /d "0" /f
+    sc config PrintNotify start=disabled
+    sc config Spooler start=disabled
+    schtasks /Change /TN "Microsoft\Windows\Printing\EduPrintProv" /Disable
+    schtasks /Change /TN "Microsoft\Windows\Printing\PrinterCleanupTask" /Disable
+    sc config RemoteRegistry start=disabled
+    sc config RemoteAccess start=disabled
+    sc config WinRM start=disabled
+    sc config RmSvc start=disabled
+    schtasks /Change /TN "Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser" /Disable
+    schtasks /Change /TN "Microsoft\Windows\Application Experience\PcaPatchDbTask" /Disable
+    schtasks /Change /TN "Microsoft\Windows\Customer Experience Improvement Program\Consolidator" /Disable
+    schtasks /Change /TN "Microsoft\Windows\Customer Experience Improvement Program\UsbCeip" /Disable
+    schtasks /Change /TN "Microsoft\Windows\Feedback\Siuf\DmClient" /Disable
+    schtasks /Change /TN "Microsoft\Windows\Feedback\Siuf\DmClientOnScenarioDownload" /Disable
+    schtasks /Change /TN "Microsoft\Windows\Flighting\FeatureConfig\ReconcileFeatures" /Disable
+    schtasks /Change /TN "Microsoft\Windows\Flighting\FeatureConfig\UsageDataFlushing" /Disable
+    schtasks /Change /TN "Microsoft\Windows\Flighting\FeatureConfig\UsageDataReporting" /Disable
+    schtasks /Change /TN "Microsoft\Windows\Maps\MapsToastTask" /Disable
+    schtasks /Change /TN "Microsoft\Windows\PushToInstall\Registration" /Disable
+    schtasks /Change /TN "Microsoft\Windows\Servicing\StartComponentCleanup" /Disable
+    schtasks /Change /TN "Microsoft\Windows\SettingSync\NetworkStateChangeTask" /Disable
+    schtasks /Change /TN "Microsoft\Windows\Time Synchronization\ForceSynchronizeTime" /Disable
+    schtasks /Change /TN "Microsoft\Windows\Time Synchronization\SynchronizeTime" /Disable
+    schtasks /Change /TN "Microsoft\Windows\Time Zone\SynchronizeTimeZone" /Disable
+    schtasks /Change /TN "Microsoft\Windows\Work Folders\Work Folders Logon Synchronization" /Disable
+    schtasks /Change /TN "Microsoft\Windows\Work Folders\Work Folders Maintenance Work" /Disable
+    schtasks /Change /TN "Microsoft\Windows\WwanSvc\NotificationTask" /Disable
+    schtasks /Change /TN "Microsoft\Windows\WwanSvc\OobeDiscovery" /Disable
+    schtasks /Change /TN "Microsoft\Windows\XblGameSave\XblGameSaveTask" /Disable
+
+    echo Services have been disabled.
+    echo.
+    echo Press any key to go to menu.
+    pause >nul
+    goto :menu
+
+:: Cpu Tweaks
+:4
+cls
+color 5
+echo Running CPU Tweaks...
+echo.
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\943c8cb6-6f93-4227-ad87-e9a3feec08d1" /v "Attributes" /t REG_DWORD /d "2" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\2a737441-1930-4402-8d77-b2bebba308a3\d4e98f31-5ffe-4ce1-be31-1b38b384c009\DefaultPowerSchemeValues\381b4222-f694-41f0-9685-ff5bb260df2e" /v "ACSettingIndex" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\2a737441-1930-4402-8d77-b2bebba308a3\d4e98f31-5ffe-4ce1-be31-1b38b384c009\DefaultPowerSchemeValues\381b4222-f694-41f0-9685-ff5bb260df2e" /v "DCSettingIndex" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\2a737441-1930-4402-8d77-b2bebba308a3\d4e98f31-5ffe-4ce1-be31-1b38b384c009\DefaultPowerSchemeValues\8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c" /v "ACSettingIndex" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\3b04d4fd-1cc7-4f23-ab1c-d1337819c4bb\DefaultPowerSchemeValues\381b4222-f694-41f0-9685-ff5bb260df2e" /v "ACSettingIndex" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\3b04d4fd-1cc7-4f23-ab1c-d1337819c4bb\DefaultPowerSchemeValues\381b4222-f694-41f0-9685-ff5bb260df2e" /v "DCSettingIndex" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\3b04d4fd-1cc7-4f23-ab1c-d1337819c4bb\DefaultPowerSchemeValues\8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c" /v "ACSettingIndex" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Processor" /v "AllowPepPerfStates" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Processor" /v "Cstates" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Processor" /v "Capabilities" /t REG_DWORD /d "516198" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "HighPerformance" /t REG_DWORD /d "1" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "HighestPerformance" /t REG_DWORD /d "1" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "MinimumThrottlePercent" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "MaximumThrottlePercent" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "MaximumPerformancePercent" /t REG_DWORD /d "100" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "Class1InitialUnparkCount" /t REG_DWORD /d "100" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "InitialUnparkCount" /t REG_DWORD /d "100" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "MaximumPerformancePercent" /t REG_DWORD /d "100" /f
+Reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WcmSvc\GroupPolicy" /v "fDisablePowerManagement" /t REG_DWORD /d "1" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power\PDC\Activators\Default\VetoPolicy" /v "EA:EnergySaverEngaged" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power\PDC\Activators\28\VetoPolicy" /v "EA:PowerStateDischarging" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power\Policy\Settings\Misc" /v "DeviceIdlePolicy" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power\Policy\Settings\Processor" /v "PerfEnergyPreference" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power\Policy\Settings\Processor" /v "PerfEnergyPreference" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power\Policy\Settings\Processor" /v "CPMinCores" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power\Policy\Settings\Processor" /v "CPMaxCores" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power\Policy\Settings\Processor" /v "CPMinCores1" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power\Policy\Settings\Processor" /v "CPMaxCores1" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power\Policy\Settings\Processor" /v "CpLatencyHintUnpark1" /t REG_DWORD /d "100" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power\Policy\Settings\Processor" /v "CPDistribution" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power\Policy\Settings\Processor" /v "CpLatencyHintUnpark" /t REG_DWORD /d "100" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power\Policy\Settings\Processor" /v "MaxPerformance1" /t REG_DWORD /d "100" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power\Policy\Settings\Processor" /v "MaxPerformance" /t REG_DWORD /d "100" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power\Policy\Settings\Processor" /v "CPDistribution1" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power\Policy\Settings\Processor" /v "CPHEADROOM" /t REG_DWORD /d "0" /f
+Reg.exe add "HKCU\Control Panel\PowerCfg\GlobalPowerPolicy" /v "Policies" /t REG_BINARY /d "01000000020000000100000000000000020000000000000000000000000000002c0100003232030304000000040000000000000000000000840300002c01000000000000840300000001646464640000" /f
+Reg.exe add "HKCU\Control Panel\PowerCfg\GlobalPowerPolicy" /v "Policies" /t REG_BINARY /d "01000000020000000100000000000000020000000000000000000000000000002c0100003232030304000000040000000000000000000000840300002c01000000000000840300000001646464640000" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Processor" /v "Cstates" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Processor" /v "Capabilities" /t REG_DWORD /d "516198" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "HighPerformance" /t REG_DWORD /d "1" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "HighestPerformance" /t REG_DWORD /d "1" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "MinimumThrottlePercent" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "MaximumThrottlePercent" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "MaximumPerformancePercent" /t REG_DWORD /d "100" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "Class1InitialUnparkCount" /t REG_DWORD /d "100" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "InitialUnparkCount" /t REG_DWORD /d "100" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "MaximumPerformancePercent" /t REG_DWORD /d "100" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerThrottling" /v "PowerThrottlingOff" /t REG_DWORD /d "1" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power\Policy\Settings\Processor" /v "CPHEADROOM" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power\Policy\Settings\Processor" /v "CPCONCURRENCY" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\ControlSet001\Control\Processor" /v "ProccesorThrottlingEnabled" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\ControlSet001\Control\Processor" /v "CpuIdleThreshold" /t REG_DWORD /d "1" /f
+Reg.exe add "HKLM\SYSTEM\ControlSet001\Control\Processor" /v "CpuIdle" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\ControlSet001\Control\Processor" /v "CpuLatencyTimer" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\ControlSet001\Control\Processor" /v "CpuSlowdown" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\ControlSet001\Control\Processor" /v "DedicatedSegmentSize" /t REG_DWORD /d "1298" /f
+Reg.exe add "HKLM\SYSTEM\ControlSet001\Control\Processor" /v "Threshold" /t REG_DWORD /d "1" /f
+Reg.exe add "HKLM\SYSTEM\ControlSet001\Control\Processor" /v "CpuDebuggingEnabled" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\ControlSet001\Control\Processor" /v "ProccesorLatencyThrottlingEnabled" /t REG_DWORD /d "0" /f
+echo.
+echo CPU Tweaks ran succefully.
+echo.
+echo Press any key to go to menu.
+pause >nul
+goto :menu
+
+
+:: GPU Tweaks
+:5
+color 5
+cls
+echo (What Gpu do you have?)
+echo 1. Nvidia
+echo 2. AMD
+echo 3. Intel
+echo 4. None
+echo.
+
+set /p GPU=(enter the corresponding number):
+
+@echo off
+
+if "%GPU%"=="1" (
+    echo Starting Nvidia Tweaks.
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{7B7A1E6E-0A7E-11EF-946A-806E6F6E6963}\0000" /v "PowerMizerEnable" /t REG_DWORD /d "1" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{7B7A1E6E-0A7E-11EF-946A-806E6F6E6963}\0000" /v "PowerMizerLevel" /t REG_DWORD /d "1" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{7B7A1E6E-0A7E-11EF-946A-806E6F6E6963}\0000" /v "PowerMizerLevelAC" /t REG_DWORD /d "1" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{7B7A1E6E-0A7E-11EF-946A-806E6F6E6963}\0000" /v "PerfLevelSrc" /t REG_DWORD /d "8738" /f 
+    
+    REG ADD "HKLM\SOFTWARE\NVIDIA Corporation\NvControlPanel2\Client" /v "OptInOrOutPreference" /t REG_DWORD /d 0 /f 
+    REG ADD "HKLM\SOFTWARE\NVIDIA Corporation\Global\FTS" /v "EnableRID44231" /t REG_DWORD /d 0 /f 
+    REG ADD "HKLM\SOFTWARE\NVIDIA Corporation\Global\FTS" /v "EnableRID64640" /t REG_DWORD /d 0 /f 
+    REG ADD "HKLM\SOFTWARE\NVIDIA Corporation\Global\FTS" /v "EnableRID66610" /t REG_DWORD /d 0 /f 
+    REG ADD "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm\Global\NVTweak" /v "DisplayPowerSaving" /t Reg_DWORD /d "0" /f 
+    REG ADD "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm\FTS" /v "EnableRID61684" /t REG_DWORD /d "1" /f
+    REG ADD "HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e96c-e325-11ce-bfc1-08002be10318}\0001\PowerSettings" /v IdlePowerState /t REG_BINARY /d 00000000 /f
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000" /v "RMHdcpKeyGlobZero" /t REG_DWORD /d 1 /f
+    REG ADD "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Dwm" /v "OverlayTestMode" /t REG_DWORD /d 5 /f
+    REG DELETE "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /v "NvBackend" /f >nul 2>&1
+    schtasks /change /disable /tn "NvTmRep_CrashReport1_{B2FE1952-0186-46C3-BAEC-A80AA35AC5B8}" >nul 2>&1 
+    schtasks /change /disable /tn "NvTmRep_CrashReport2_{B2FE1952-0186-46C3-BAEC-A80AA35AC5B8}" >nul 2>&1 
+    schtasks /change /disable /tn "NvTmRep_CrashReport3_{B2FE1952-0186-46C3-BAEC-A80AA35AC5B8}" >nul 2>&1 
+    schtasks /change /disable /tn "NvTmRep_CrashReport4_{B2FE1952-0186-46C3-BAEC-A80AA35AC5B8}" >nul 2>&1 
+    schtasks /change /disable /tn "NVIDIA GeForce Experience SelfUpdate_{B2FE1952-0186-46C3-BAEC-A80AA35AC5B8}" >nul 2>&1 
+    schtasks /change /disable /tn "NvDriverUpdateCheckDaily_{B2FE1952-0186-46C3-BAEC-A80AA35AC5B8}" >nul 2>&1 
+
+    FOR /f %%g IN ('wmic path win32_VideoController get PNPDeviceID ^| findstr /L "VEN_"') do REG ADD "HKLM\SYSTEM\CurrentControlSet\Enum\%%g\Device Parameters\Interrupt Management\MessageSignaledInterruptProperties" /v "MSISupported" /t REG_DWORD /d "1" /f 
+    FOR /f %%g IN ('wmic path win32_VideoController get PNPDeviceID ^| findstr /L "VEN_"') do REG DELETE "HKLM\System\CurrentControlSet\Enum\%%g\Device Parameters\Interrupt Management\Affinity Policy" /v "DevicePriority" /f >nul 2>&1
+    FOR /f %%i IN ('wmic path Win32_NetworkAdapter get PNPDeviceID ^| findstr /L "VEN_"') do REG ADD "HKLM\SYSTEM\CurrentControlSet\Enum\%%i\Device Parameters\Interrupt Management\MessageSignaledInterruptProperties" /v "MSISupported" /t REG_DWORD /d "1" /f 
+    FOR /f %%i IN ('wmic path Win32_NetworkAdapter get PNPDeviceID ^| findstr /L "VEN_"') do REG DELETE "HKLM\System\CurrentControlSet\Enum\%%i\Device Parameters\Interrupt Management\Affinity Policy" /v "DevicePriority" /f >nul 2>&1
+    FOR /f %%u IN ('wmic path Win32_USBController get PNPDeviceID^| findstr /l "PCI\VEN_"') do (
+        REG ADD "HKLM\System\CurrentControlSet\Enum\%%u\Device Parameters\Interrupt Management\Affinity Policy" /f /v DevicePolicy /t REG_DWORD /d 4 >nul 2>&1
+        REG ADD "HKLM\System\CurrentControlSet\Enum\%%u\Device Parameters\Interrupt Management\Affinity Policy" /f /v AssignmentSetOverride /t REG_BINARY /d C0 >nul 2>&1
+    )
+    FOR /f %%v IN ('wmic path Win32_VideoController get PNPDeviceID^| findstr /l "PCI\VEN_"') do (
+        REG ADD "HKLM\System\CurrentControlSet\Enum\%%v\Device Parameters\Interrupt Management\Affinity Policy" /f /v DevicePolicy /t REG_DWORD /d 4 >nul 2>&1
+        REG ADD "HKLM\System\CurrentControlSet\Enum\%%v\Device Parameters\Interrupt Management\Affinity Policy" /f /v AssignmentSetOverride /t REG_BINARY /d C0 >nul 2>&1
+    )
+    FOR /f %%n IN ('wmic path Win32_NetworkAdapter get PNPDeviceID^| findstr /l "PCI\VEN_"') do ( 
+        REG ADD "HKLM\System\CurrentControlSet\Enum\%%n\Device Parameters\Interrupt Management\Affinity Policy" /f /v DevicePolicy /t REG_DWORD /d 4 >nul 2>&1
+        REG ADD "HKLM\System\CurrentControlSet\Enum\%%n\Device Parameters\Interrupt Management\Affinity Policy" /f /v AssignmentSetOverride /t REG_BINARY /d 30 >nul 2>&1
+    )
+    echo Starting Nvidia Profile Inspector Script.
+    timeout 3 > nul  
+    cls
+
+    goto:NvidiaProfileInspector
+    
+) else if "%GPU%"=="2" (
+    echo Starting AMD Tweaks.
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000" /v "3D_Refresh_Rate_Override_DEF" /t Reg_DWORD /d "0" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000" /v "3to2Pulldown_NA" /t Reg_DWORD /d "0" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000" /v "AAF_NA" /t Reg_DWORD /d "0" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000" /v "Adaptive De-interlacing" /t Reg_DWORD /d "1" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000" /v "AllowRSOverlay" /t Reg_SZ /d "false" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000" /v "AllowSkins" /t Reg_SZ /d "false" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000" /v "AllowSnapshot" /t Reg_DWORD /d "0" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000" /v "AllowSubscription" /t Reg_DWORD /d "0" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000" /v "AntiAlias_NA" /t Reg_SZ /d "0" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000" /v "AreaAniso_NA" /t Reg_SZ /d "0" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000" /v "ASTT_NA" /t Reg_SZ /d "0" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000" /v "AutoColorDepthReduction_NA" /t Reg_DWORD /d "0" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000" /v "DisableSAMUPowerGating" /t Reg_DWORD /d "1" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000" /v "DisableUVDPowerGatingDynamic" /t Reg_DWORD /d "1" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000" /v "DisableVCEPowerGating" /t Reg_DWORD /d "1" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000" /v "EnableAspmL0s" /t Reg_DWORD /d "0" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000" /v "EnableAspmL1" /t Reg_DWORD /d "0" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000" /v "EnableUlps" /t Reg_DWORD /d "0" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000" /v "EnableUlps_NA" /t Reg_SZ /d "0" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000" /v "KMD_DeLagEnabled" /t Reg_DWORD /d "1" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000" /v "KMD_FRTEnabled" /t Reg_DWORD /d "0" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000" /v "DisableDMACopy" /t Reg_DWORD /d "1" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000" /v "DisableBlockWrite" /t Reg_DWORD /d "0" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000" /v "StutterMode" /t Reg_DWORD /d "0" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000" /v "EnableUlps" /t Reg_DWORD /d "0" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000" /v "PP_SclkDeepSleepDisable" /t Reg_DWORD /d "1" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000" /v "PP_ThermalAutoThrottlingEnable" /t Reg_DWORD /d "0" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000" /v "DisableDrmdmaPowerGating" /t Reg_DWORD /d "1" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000" /v "KMD_EnableComputePreemption" /t Reg_DWORD /d "0" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000\UMD" /t Reg_SZ /d "1" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000\UMD" /v "Main3D" /t Reg_BINARY /d "3100" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000\UMD" /v "FlipQueueSize" /t Reg_BINARY /d "3100" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000\UMD" /v "ShaderCache" /t Reg_BINARY /d "3200" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000\UMD" /v "Tessellation_OPTION" /t Reg_BINARY /d "3200" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000\UMD" /v "Tessellation" /t Reg_BINARY /d "3100" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000\UMD" /v "VSyncControl" /t Reg_BINARY /d "3000" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000\UMD" /v "TFQ" /t Reg_BINARY /d "3200" /f 
+    REG ADD "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Video\{B784559B-672D-11EE-A4CA-E612636C81AA}\0000\DAL2_DATA__2_0\DisplayPath_4\EDID_D109_78E9\Option" /v "ProtectionControl" /t REG_BINARY /d "0100000001000000" /f 
+
+    echo Setting interrupt policies...
+    FOR /f %%g IN ('wmic path win32_VideoController get PNPDeviceID ^| findstr /L "VEN_"') do REG ADD "HKLM\SYSTEM\CurrentControlSet\Enum\%%g\Device Parameters\Interrupt Management\MessageSignaledInterruptProperties" /v "MSISupported" /t REG_DWORD /d "1" /f 
+    FOR /f %%g IN ('wmic path win32_VideoController get PNPDeviceID ^| findstr /L "VEN_"') do REG DELETE "HKLM\System\CurrentControlSet\Enum\%%g\Device Parameters\Interrupt Management\Affinity Policy" /v "DevicePriority" /f >nul 2>&1
+    FOR /f %%i IN ('wmic path Win32_NetworkAdapter get PNPDeviceID ^| findstr /L "VEN_"') do REG ADD "HKLM\SYSTEM\CurrentControlSet\Enum\%%i\Device Parameters\Interrupt Management\MessageSignaledInterruptProperties" /v "MSISupported" /t REG_DWORD /d "1" /f 
+    FOR /f %%i in ('wmic path Win32_NetworkAdapter get PNPDeviceID ^| findstr /L "VEN_"') do REG DELETE "HKLM\System\CurrentControlSet\Enum\%%i\Device Parameters\Interrupt Management\Affinity Policy" /v "DevicePriority" /f >nul 2>&1
+    FOR /f %%u IN ('wmic path Win32_USBController get PNPDeviceID^| findstr /l "PCI\VEN_"') do (
+        REG ADD "HKLM\System\CurrentControlSet\Enum\%%u\Device Parameters\Interrupt Management\Affinity Policy" /f /v DevicePolicy /t REG_DWORD /d 4 >nul 2>&1
+        REG ADD "HKLM\System\CurrentControlSet\Enum\%%u\Device Parameters\Interrupt Management\Affinity Policy" /f /v AssignmentSetOverride /t REG_BINARY /d C0 >nul 2>&1
+    )
+    FOR /f %%v IN ('wmic path Win32_VideoController get PNPDeviceID^| findstr /l "PCI\VEN_"') do (
+        REG ADD "HKLM\System\CurrentControlSet\Enum\%%v\Device Parameters\Interrupt Management\Affinity Policy" /f /v DevicePolicy /t REG_DWORD /d 4 >nul 2>&1
+        REG ADD "HKLM\System\CurrentControlSet\Enum\%%v\Device Parameters\Interrupt Management\Affinity Policy" /f /v AssignmentSetOverride /t REG_BINARY /d C0 >nul 2>&1
+    )
+    FOR /f %%n IN ('wmic path Win32_NetworkAdapter get PNPDeviceID^| findstr /l "PCI\VEN_"') do (
+        REG ADD "HKLM\System\CurrentControlSet\Enum\%%n\Device Parameters\Interrupt Management\Affinity Policy" /f /v DevicePolicy /t REG_DWORD /d 4 >nul 2>&1
+        REG ADD "HKLM\System\CurrentControlSet\Enum\%%n\Device Parameters\Interrupt Management\Affinity Policy" /f /v AssignmentSetOverride /t REG_BINARY /d 30 >nul 2>&1
+    )
+	pause
+        goto:DoneSkipGpu
+) else if "%GPU%"=="3" (
+    echo Starting Intel Tweaks.
+    for /f %%t in ('Reg query "HKLM\System\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}" /t REG_SZ /s /e /f "Intel" ^| findstr "HKEY"') do (
+    Reg.exe add "%%t" /v "Disable_OverlayDSQualityEnhancement" /t REG_DWORD /d "1" /f
+    Reg.exe add "%%t" /v "IncreaseFixedSegment" /t REG_DWORD /d "1" /f
+    Reg.exe add "%%t" /v "AdaptiveVsyncEnable" /t REG_DWORD /d "0" /f
+    Reg.exe add "%%t" /v "DisablePFonDP" /t REG_DWORD /d "1" /f
+    Reg.exe add "%%t" /v "EnableCompensationForDVI" /t REG_DWORD /d "1" /f
+    Reg.exe add "%%t" /v "NoFastLinkTrainingForeDP" /t REG_DWORD /d "0" /f
+    Reg.exe add "%%t" /v "ACPowerPolicyVersion" /t REG_DWORD /d "16898" /f
+    Reg.exe add "%%t" /v "DCPowerPolicyVersion" /t REG_DWORD /d "16642" /f
+  )
+
+  Reg.exe add "HKLM\Software\Intel\GMM" /v "DedicatedSegmentSize" /t REG_DWORD /d "512" /f
+
+    pause
+    goto:DoneSkipGpu
+) else if "%GPU%"=="4" (
+    echo Skipping Gpu Tweaks.
+    timeout 1 > nul 
+    goto:DoneSkipGpu
+) else (
+    echo Invalid input. Please enter the number corresponding to your GPU type.
+)
+
+cls
+:NvidiaProfileInspector
+echo Running Nvidia Profile Inspector with imported optimized settings...
+set "fileURL=https://github.com/QuakedK/Downloads/raw/main/nvidiaProfileInspector.exe"
+set "fileName=nvidiaProfileInspector.exe"
+set "fileURL2=https://raw.githubusercontent.com/QuakedK/Downloads/main/QuakedOptimizedNVProflie.nip"
+set "fileName2=Quaked Optimized NV Proflie.nip"
+set "downloadsFolder=%USERPROFILE%\Downloads"
+chcp 65001 >nul 2>&1
+echo.
+echo. 
+echo.
+echo.   Downloading resources    
+echo.                              
+echo. 
+
+curl -s -L "%fileURL%" -o "%downloadsFolder%\%fileName%"
+curl -s -L "%fileURL2%" -o "%downloadsFolder%\%fileName2%"
+if exist "%downloadsFolder%\%fileName%" (
+    echo Download successful!
+    echo Importing configuration file...
+    "%downloadsFolder%\%fileName%" -importProfile "%downloadsFolder%\%fileName2%"  
+    pause
+) else (
+    echo Download of executable failed.
+    echo Skipping importing configuration file.
+    pause
+)
+
+:DoneSkipGpu
+echo Press any key to go to menu.
+pause >nul
+goto :menu
+
+:: CLEANUP
+:6
+cls
+color 5
+echo Running Cleanup.
+del "%LocalAppData%\Microsoft\Windows\INetCache\." /s /f /q
+del "%AppData%\Local\Microsoft\Windows\INetCookies\." /s /f /q
+del "%temp%" /s /f /q
+del "%AppData%\Discord\Cache\." /s /f /q
+del "%AppData%\Discord\Code Cache\." /s /f /q
+del "%ProgramData%\USOPrivate\UpdateStore" /s /f /q
+del "%ProgramData%\USOShared\Logs" /s /f /q
+del "C:\Windows\System32\SleepStudy" /s /f /q
+rmdir /S /Q "%AppData%\Local\Microsoft\Windows\INetCache\"
+rmdir /S /Q "%AppData%\Local\Microsoft\Windows\INetCookies"
+rmdir /S /Q "%LocalAppData%\Microsoft\Windows\WebCache"
+rmdir /S /Q "%AppData%\Local\Temp\"
+rd "%AppData%\Discord\Cache" /s /q
+rd "%AppData%\Discord\Code Cache" /s /q
+rd "%SystemDrive%\$GetCurrent" /s /q
+rd "%SystemDrive%\$SysReset" /s /q
+rd "%SystemDrive%\$Windows.~BT" /s /q
+rd "%SystemDrive%\$Windows.~WS" /s /q
+rd "%SystemDrive%\$WinREAgent" /s /q
+rd "%SystemDrive%\OneDriveTemp" /s /q
+del "%WINDIR%\Logs" /s /f /q
+del "%WINDIR%\Installer\$PatchCache$" /s /f /q
+rd /s /q %LocalAppData%\Temp
+rd /s /q %LocalAppData%\Temp\mozilla-temp-files
+rmdir /s /q "%SystemRoot%\System32\SleepStudy"
+rmdir /s /q "%SystemRoot%\System32\SleepStudy >nul 2>&1"
+Del /S /F /Q %temp%
+Del /S /F /Q %Windir%\Temp
+Del /S /F /Q C:\WINDOWS\Prefetch
+ipconfig /release
+ipconfig /renew
+arp -d *
+nbtstat -R
+nbtstat -RR
+ipconfig /flushdns
+ipconfig /registerdns
+echo Cleanup was ran successfully.
+echo.
+echo Press any key to go to menu.
+pause >nul
+goto :menu
+
+:: Debloat
+:7
+cls
+color 5
+echo Debloating PC
+Powershell.exe -command "& {Get-AppxPackage *Microsoft.BingWeather* | Remove-AppxPackage}
+Powershell.exe -command "& {Get-AppxPackage *Microsoft.GetHelp* | Remove-AppxPackage}
+Powershell.exe -command "& {Get-AppxPackage *Microsoft.Getstarted* | Remove-AppxPackage}
+Powershell.exe -command "& {Get-AppxPackage *Microsoft.Messaging* | Remove-AppxPackage}
+Powershell.exe -command "& {Get-AppxPackage *Microsoft.Microsoft3DViewer* | Remove-AppxPackage}
+Powershell.exe -command "& {Get-AppxPackage *Microsoft.MicrosoftSolitaireCollection* | Remove-AppxPackage}
+Powershell.exe -command "& {Get-AppxPackage *Microsoft.MicrosoftStickyNotes* | Remove-AppxPackage}
+Powershell.exe -command "& {Get-AppxPackage *Microsoft.MixedReality.Portal* | Remove-AppxPackage}
+Powershell.exe -command "& {Get-AppxPackage *Microsoft.MSPaint* | Remove-AppxPackage}
+Powershell.exe -command "& {Get-AppxPackage *Microsoft.Office.OneNote* | Remove-AppxPackage}
+Powershell.exe -command "& {Get-AppxPackage *Microsoft.OneConnect* | Remove-AppxPackage}
+Powershell.exe -command "& {Get-AppxPackage *Microsoft.People* | Remove-AppxPackage}
+Powershell.exe -command "& {Get-AppxPackage *Microsoft.Print3D* | Remove-AppxPackage}
+Powershell.exe -command "& {Get-AppxPackage *Microsoft.ScreenSketch* | Remove-AppxPackage}
+Powershell.exe -command "& {Get-AppxPackage *Microsoft.SkypeApp* | Remove-AppxPackage}
+Powershell.exe -command "& {Get-AppxPackage *Microsoft.WindowsAlarms* | Remove-AppxPackage}
+Powershell.exe -command "& {Get-AppxPackage *Microsoft.WindowsCamera* | Remove-AppxPackage}
+Powershell.exe -command "& {Get-AppxPackage *microsoft.windowscommunicationsapps* | Remove-AppxPackage}
+Powershell.exe -command "& {Get-AppxPackage *Microsoft.WindowsFeedbackHub* | Remove-AppxPackage}
+Powershell.exe -command "& {Get-AppxPackage *Microsoft.WindowsMaps* | Remove-AppxPackage}
+Powershell.exe -command "& {Get-AppxPackage *Microsoft.WindowsFeedbackHub* | Remove-AppxPackage}
+Powershell.exe -command "& {Get-AppxPackage *Microsoft.WindowsSoundRecorder* | Remove-AppxPackage}
+Powershell.exe -command "& {Get-AppxPackage *Microsoft.YourPhone* | Remove-AppxPackage}
+Powershell.exe -command "& {Get-AppxPackage *Microsoft.ZuneMusic* | Remove-AppxPackage}
+Powershell.exe -command "& {Get-AppxPackage *Microsoft.HEIFImageExtension* | Remove-AppxPackage}
+Powershell.exe -command "& {Get-AppxPackage *Microsoft.WebMediaExtensions* | Remove-AppxPackage}
+Powershell.exe -command "& {Get-AppxPackage *Microsoft.WebpImageExtension* | Remove-AppxPackage}
+Powershell.exe -command "& {Get-AppxPackage *Microsoft.3dBuilder* | Remove-AppxPackage}
+reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Copilot" /v TurnOffWindowsCopilot /t REG_DWORD /d 1 /f
+PowerShell -ExecutionPolicy Unrestricted -Command "Get-AppxPackage *Cortana* | Remove-AppxPackage"
+PowerShell -ExecutionPolicy Unrestricted -Command "Get-AppxPackage *WindowsCalculator* | Remove-AppxPackage"
+PowerShell -ExecutionPolicy Unrestricted -Command "Get-AppxPackage *WindowsMaps* | Remove-AppxPackage"
+PowerShell -ExecutionPolicy Unrestricted -Command "Get-AppxPackage *king.com.CandyCrushSaga* | Remove-AppxPackage"
+PowerShell -ExecutionPolicy Unrestricted -Command "Get-AppxPackage *king.com.CandyCrushSodaSaga* | Remove-AppxPackage"
+PowerShell -ExecutionPolicy Unrestricted -Command "Get-AppxPackage *Clipchamp* | Remove-AppxPackage"
+Reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DWM" /v "DWMWA_TRANSITIONS_FORCEDISABLED" /t REG_DWORD /d "1" /f
+Reg.exe add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DWM" /v "DisallowAnimations" /t REG_DWORD /d "1" /f
+Reg.exe add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "EnableTransparency" /t REG_DWORD /d "0" /f
+Reg.exe add "HKCU\Control Panel\Desktop\WindowMetrics" /v "MinAnimate" /t REG_SZ /d "0" /f
+Reg.exe add "HKCU\Control Panel\Desktop\WindowMetrics" /v "MaxAnimate" /t REG_SZ /d "0" /f
+Reg.exe add "HKCU\Software\Microsoft\Windows\CurrentVersion\VideoSettings" /v "VideoQualityOnBattery" /t REG_DWORD /d "1" /f
+Reg.exe add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" /v "VisualFXSetting" /t REG_DWORD /d "3" /f
+Reg.exe add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects\AnimateMinMax" /v "DefaultApplied" /t REG_DWORD /d "1" /f
+Reg.exe add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects\ComboBoxAnimation" /v "DefaultApplied" /t REG_DWORD /d "1" /f
+Reg.exe add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects\ControlAnimations" /v "DefaultApplied" /t REG_DWORD /d "1" /f
+Reg.exe add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects\CursorShadow" /v "DefaultApplied" /t REG_DWORD /d "0" /f
+Reg.exe add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects\DragFullWindows" /v "DefaultApplied" /t REG_DWORD /d "1" /f
+Reg.exe add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects\DropShadow" /v "DefaultApplied" /t REG_DWORD /d "0" /f
+Reg.exe add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects\DWMAeroPeekEnabled" /v "DefaultApplied" /t REG_DWORD /d "1" /f
+Reg.exe add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects\DWMEnabled" /v "DefaultApplied" /t REG_DWORD /d "1" /f
+Reg.exe add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects\DWMSaveThumbnailEnabled" /v "DefaultApplied" /t REG_DWORD /d "1" /f
+Reg.exe add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects\FontSmoothing" /f
+Reg.exe add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects\ListBoxSmoothScrolling" /v "DefaultApplied" /t REG_DWORD /d "1" /f
+Reg.exe add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects\ListviewAlphaSelect" /v "DefaultApplied" /t REG_DWORD /d "1" /f
+Reg.exe add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects\ListviewShadow" /v "DefaultApplied" /t REG_DWORD /d "1" /f
+Reg.exe add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects\MenuAnimation" /v "DefaultApplied" /t REG_DWORD /d "0" /f
+Reg.exe add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects\SelectionFade" /v "DefaultApplied" /t REG_DWORD /d "1" /f
+Reg.exe add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects\TaskbarAnimations" /v "DefaultApplied" /t REG_DWORD /d "0" /f
+Reg.exe add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects\Themes" /v "DefaultApplied" /t REG_DWORD /d "1" /f
+Reg.exe add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects\ThumbnailsOrIcon" /v "DefaultApplied" /t REG_DWORD /d "1" /f
+Reg.exe add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects\TooltipAnimation" /v "DefaultApplied" /t REG_DWORD /d "1" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "QosManagesIdleProcessors" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "InitialUnparkCount" /t REG_DWORD /d "100" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "HighPerformance" /t REG_DWORD /d "1" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "HighestPerformance" /t REG_DWORD /d "1" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "MinimumThrottlePercent" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "MaximumThrottlePercent" /t REG_DWORD /d "0" /f
+Reg.exe add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "MaximumPerformancePercent" /t REG_DWORD /d "100" /f
+sc config NcbService start=disabled >nul 2>&1
+sc config jhi_service start=disabled >nul 2>&1
+sc config WMIRegistrationService start=disabled >nul 2>&1
+sc config "Intel(R) TPM Provisioning Service" start=disabled >nul 2>&1
+sc config ipfsvc start=disabled >nul 2>&1
+sc config igccservice start=disabled >nul 2>&1
+sc config cplspcon start=disabled >nul 2>&1
+sc config AMD Crash Defender Service start=disabled >nul 2>&1
+sc config AMD External Events Utility start=disabled >nul 2>&1
+sc config AUEPLauncher start=disabled >nul 2>&1
+schtasks /Change /TN "GoogleUpdateTaskMachineCore{9C99738B-B026-4A33-A16D-7CCD7650D527}" /Disable >nul 2>&1
+schtasks /Change /TN "GoogleUpdateTaskMachineUA{2E0C9FAD-7C87-42A8-8EFF-986A5662B894}" /Disable >nul 2>&1
+schtasks /Change /TN "Opera GX scheduled Autoupdate 1711926802" /Disable >nul 2>&1
+schtasks /Change /TN "BraveSoftwareUpdateTaskMachineCore{A8A54493-B843-4D11-BA1F-30C26E9F10BE}" /Disable >nul 2>&1
+schtasks /Change /TN "BraveSoftwareUpdateTaskMachineUA{FF1E0511-D7AF-4DB6-8A41-DC39EA60EC93}" /Disable >nul 2>&1
+schtasks /Change /TN "CCleaner Update" /Disable >nul 2>&1
+schtasks /Change /TN "CCleanerCrashReporting" /Disable >nul 2>&1
+schtasks /Change /TN "CCleanerUpdateTaskMachineCore" /Disable >nul 2>&1
+schtasks /Change /TN "CCleanerUpdateTaskMachineUA" /Disable >nul 2>&1
+schtasks /Change /TN "Microsoft\Windows\capabilityaccessmanager" /Disable
+schtasks /Change /TN "Microsoft\Windows\Setup\SetupCleanupTask" /Disable
+schtasks /Change /TN "Microsoft\Windows\Setup\SnapshotCleanupTask" /Disable
+schtasks /Change /TN "Microsoft\Windows\Shell\FamilySafetyMonitor" /Disable
+schtasks /Change /TN "Microsoft\Windows\Shell\FamilySafetyRefreshTask" /Disable
+schtasks /Change /TN "Microsoft\Windows\Shell\ThemesSyncedImageDownload" /Disable
+schtasks /Change /TN "Microsoft\Windows\Shell\UpdateUserPictureTask" /Disable
+schtasks /Change /TN "Microsoft\Windows\.NET Framework\.NET Framework NGEN v4.0.30319" /Disable
+schtasks /Change /TN "Microsoft\Windows\.NET Framework\.NET Framework NGEN v4.0.30319 64" /Disable
+schtasks /Change /TN "Microsoft\Windows\.NET Framework\.NET Framework NGEN v4.0.30319 64 Critical" /Disable
+schtasks /Change /TN "Microsoft\Windows\.NET Framework\.NET Framework NGEN v4.0.30319 Critical" /Disable
+schtasks /Change /TN "Microsoft\Windows\Application Experience\SdbinstMergeDbTask" /Disable
+schtasks /Change /TN "Microsoft\Windows\Printing\PrintJobCleanupTask" /Disable
+schtasks /Delete /TN "GoogleUpdateTaskMachineCore{9C99738B-B026-4A33-A16D-7CCD7650D527}" /F >nul 2>&1
+schtasks /Delete /TN "GoogleUpdateTaskMachineUA{2E0C9FAD-7C87-42A8-8EFF-986A5662B894}" /F >nul 2>&1
+schtasks /Delete /TN "Opera GX scheduled Autoupdate 1711926802" /F >nul 2>&1
+schtasks /Delete /TN "BraveSoftwareUpdateTaskMachineCore{A8A54493-B843-4D11-BA1F-30C26E9F10BE}" /F >nul 2>&1
+schtasks /Delete /TN "BraveSoftwareUpdateTaskMachineUA{FF1E0511-D7AF-4DB6-8A41-DC39EA60EC93}" /F >nul 2>&1
+schtasks /Delete /TN "CCleaner Update" /F >nul 2>&1
+schtasks /Delete /TN "CCleanerCrashReporting" /F >nul 2>&1
+schtasks /Delete /TN "CCleanerUpdateTaskMachineCore" /F >nul 2>&1
+schtasks /Delete /TN "CCleanerUpdateTaskMachineUA" /F >nul 2>&1
+taskkill /f /im amdfendrsr.exe >nul 2>&1
+taskkill /f /im atieclxx.exe >nul 2>&1
+taskkill /f /im atiesrxx.exe >nul 2>&1
+taskkill /f /im AUEPMaster.exe >nul 2>&1
+rd /s /q "C:\Windows\System32\amdfendrsr.exe" >nul 2>&1
+rd /s /q "C:\Windows\System32\DriverStore\FileRepository\u0390451.inf_amd64_39377efdd62734d1\B390182\atieclxx.exe" >nul 2>&1
+rd /s /q "C:\Windows\System32\DriverStore\FileRepository\u0390451.inf_amd64_39377efdd62734d1\B390182\atiesrxx.exe" >nul 2>&1
+rd /s /q "C:\Program Files\AMD\Performance Profile Client\AUEPMaster.exe" >nul 2>&1
+taskkill /f /im RtkAudUService64.exe >nul 2>&1
+net stop "RtkAudioUniversalService" >nul 2>&1
+sc config RtkAudioUniversalService start=disabled >nul 2>&1
+rd /s /q "C:\Windows\System32\DriverStore\FileRepository\realtekservice.inf_amd64_af49968a824c7864\RtkAudUService64.exe" >nul 2>&1
+rd /s /q "C:\Windows\System32\DriverStore\FileRepository\realtekservice.inf_amd64_1803724721d1a34c\RtkAudUService64.exe" >nul 2>&1
+rd /s /q "C:\Windows\System32\DriverStore\FileRepository\realtekservice.inf_amd64_af49968a824c7864" >nul 2>&1
+rd /s /q "C:\Windows\System32\DriverStore\FileRepository\realtekservice.inf_amd64_1803724721d1a34c" >nul 2>&1
+echo Windows is now Debloated.
+echo.
+echo Press any key to go to menu.
+pause >nul
+
+:: Latency
+:8
+cls
+color 5
+bcdedit /deletevalue useplatformclock >nul 2>&1
+bcdedit /set disabledynamictick yes
+bcdedit /set useplatformtick yes
+@echo off
+setlocal
+
+echo Detecting Network Adapter...
+
+for /f "skip=1 delims=" %%a in ('wmic nic where "NetConnectionStatus=2" get NetConnectionID /value 2^>nul') do (
+    for /f "tokens=2 delims==" %%b in ("%%a") do (
+        set "adapter_name=%%b"
+    )
+)
+
+if defined adapter_name (
+    echo Your current network adapter is: %adapter_name%
+
+    echo Enabling Interrupt Moderation and setting Interrupt Moderation Rate to medium...
+    powershell -Command "Get-NetAdapterAdvancedProperty -Name \"%adapter_name%\" -DisplayName 'Interrupt Moderation' | Set-NetAdapterAdvancedProperty -RegistryValue 1"
+    powershell -Command "Get-NetAdapterAdvancedProperty -Name \"%adapter_name%\" -DisplayName 'Interrupt Moderation Rate' | Set-NetAdapterAdvancedProperty -RegistryValue 125"
+
+    echo Setting NetworkThrottlingIndex to 10...
+    reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v "NetworkThrottlingIndex" /t REG_DWORD /d 10 /f
+    echo NDIS Tweaks appiled successfully.
+) else (
+    echo Unable to detect your current network adapter.
+    pause
+    exit /b
+)
+
+endlocal
+echo Press any key to go to menu.
+pause >nul
+goto :menu
+
+:: Disable Windows Defender
+:9
+echo Disabling Windows Defender
+reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender" /v "DisableAntiSpyware" /t "REG_DWORD" /d "1" /f
+echo Windows Defender disabled successfully.
+echo.
+echo Press any key to go to menu.
+pause >nul
+goto :menu
+
+:: Mouse Tweaks
+:10
+echo Tweaking Mouse & Keyboard
+reg add "HKEY_CURRENT_USER\Control Panel\Mouse" /v MouseSpeed /t REG_SZ /d 0 /f
+reg add "HKEY_CURRENT_USER\Control Panel\Mouse" /v MouseThreshold1 /t REG_SZ /d 0 /f
+reg add "HKEY_CURRENT_USER\Control Panel\Mouse" /v MouseThreshold2 /t REG_SZ /d 0 /f
+reg add "HKEY_CURRENT_USER\Control Panel\Keyboard" /v KeyboardDelay /t REG_SZ /d 0 /f
+reg add "HKEY_CURRENT_USER\Control Panel\Keyboard" /v KeyboardSpeed /t REG_SZ /d 31 /f
+echo Keyboard & Mouse tweaked successfully
+echo.
+echo Press any key to go to menu.
+pause >nul
+goto :menu
+
+
+
+:: Exit Script
+:11
+exit 1
+
+:: Pc Restart
+:12
+shutdown /r /t 0
+
+:: Credits
+:13
+cls
+color 5
+echo Credits to;
+echo   - Codelife
+echo   - Quaked
+echo   - Chris Titus
+echo   - Barefox
+echo   - Strayaaa
+echo   - Zsn
+echo   - LeStripez
+echo.
+echo Press any key to go to menu.
+pause >nul
+goto :menu
