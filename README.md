@@ -1,3 +1,2 @@
-Make sure to create a restore point before doing anything. You can do a restore point by running the script and choosing number 1.
-Join our discord for updates and changelogs.
-I am not responsible from any damage taken by this script.
+XZBoost, an ultimate tweaking script 🤩. Simply run XZBoost as admin and choose your option.
+join our discord https://discord.gg/C9NE8bmbQy for changelogs and updates.
