@@ -1,17 +1,35 @@
-XZBoost 1.2
-28.05.2024
-
-XZBoost 1.1 = 142.4 KB
+XZBoost 2.0
+17.06.2024
 
 XZBoost 1.2 = 204 KB
 
-Changes:
-Remade RAM Tweaks.
+XZBoost 2.0 = 261 KB
 
-Added USB Tweaks, IO Tweaks, Kernel Tweaks, Disable Latency Cap, Remove OneDrive, Optimize Drivers, And Resource Policy Tweaks to Windows Tweaks section.
+**Changes:**
+- Removed 23 lines of code from registry tweaks that caused pc to loop crash.
 
-Remade Network Tweaks.
+- Added ascii text to all menus.
 
-Remade GPU Tweaks
+- Added warning tab to the start.
 
-Added GPU Hidden Registry Tweaks to Registry Tweaks section.
+- Remade AMD tweaks.
+
+- Added more services to disable.
+
+- Added more things to remove in debloat.
+
+- Added a red text saying "This will most likely take awhile, please wait." to debloat tab.
+
+- Removed io tweaks, latency cap tweaks, kernel tweaks, resource policy tweaks cause they were doing no shit.
+
+- Added fix menu to solve possible issues.
+
+- Made windows setting tweaks to deanimate windows.
+
+- Made WAYY more tweaks to windows settings tweaks (its now actually insane).
+
+- Made more tweaks to fortnite optimizations.
+
+- Completely remade minecraft tweaks.
+
+- Fixed spelling errors.
