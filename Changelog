@@ -1,35 +1,20 @@
-XZBoost 2.0
-17.06.2024
+XZBoost 2.1
+30.06.2024
 
-XZBoost 1.2 = 204 KB
+- Added a welcome message saying "Welcome to XZBoost Menu (user)!".
 
-XZBoost 2.0 = 261 KB
+- Completely removed Fun Games.
 
-**Changes:**
-- Removed 23 lines of code from registry tweaks that caused pc to loop crash.
+- Sorted ALOT of things.
 
-- Added ascii text to all menus.
+- Removed cls's (clear screen) from windows tweaks so the user could see something.
 
-- Added warning tab to the start.
+- Removed unnessecary @echo off's.
 
-- Remade AMD tweaks.
+- Made the warning menu better.
 
-- Added more services to disable.
+- Made the xzboost menu to be in the middle instead of at the top.
 
-- Added more things to remove in debloat.
+- Added a check for admin privileges section to the very start of the script.
 
-- Added a red text saying "This will most likely take awhile, please wait." to debloat tab.
-
-- Removed io tweaks, latency cap tweaks, kernel tweaks, resource policy tweaks cause they were doing no shit.
-
-- Added fix menu to solve possible issues.
-
-- Made windows setting tweaks to deanimate windows.
-
-- Made WAYY more tweaks to windows settings tweaks (its now actually insane).
-
-- Made more tweaks to fortnite optimizations.
-
-- Completely remade minecraft tweaks.
-
-- Fixed spelling errors.
+- Added DISM.exe /Online /Cleanup-Image /CheckHealth & DISM.exe /Online /Cleanup-Image /ScanHealth to Fix Windows errors section.
